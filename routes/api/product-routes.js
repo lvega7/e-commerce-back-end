@@ -7,9 +7,19 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 router.get('/', (req, res) => {
   // find all products
   // be sure to include its associated Category and Tag data
-  ProductTag.findAll({}).then(results => {
-    res.json(results);
-  })
+  Product.findAll({
+    include: [
+      {
+        model: Category,
+       
+      }],
+      include:[{
+        model:Tag, 
+        through:ProductTag
+      }]
+  }).then(tag => {
+    res.json(tag);
+  });
 });
 
 // get one product
@@ -19,7 +29,17 @@ router.get('/:id', (req, res) => {
   Product.findAll({
     where: {
       id: req.params.id
-    }
+    },
+    include: [
+      {
+        model: Category,
+       
+      }],
+      include:[{
+        model:Tag, 
+        through:ProductTag
+      }]
+    
   }).then(results => {
     res.json(results);
   });
@@ -27,6 +47,18 @@ router.get('/:id', (req, res) => {
 
 // create new product
 router.post('/', (req, res) => {
+
+  Product.create({
+    product_name: req.body.product_name,
+    price: req.body.price,
+    stock: req.body.stock})
+
+    .then(name => res.json(name))
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+
   /* req.body should look like this...
     {
       product_name: "Basketball",
@@ -101,6 +133,13 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
+  Product.destroy({
+    where: {
+      id: req.params.id
+    }
+  }).then(dbPost => {
+    res.json(dbPost);
+  });
 });
 
 module.exports = router;
