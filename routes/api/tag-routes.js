@@ -1,11 +1,27 @@
 const router = require('express').Router();
 const { Tag, Product, ProductTag } = require('../../models');
 
+
 // The `/api/tags` endpoint
 
 router.get('/', (req, res) => {
   // find all tags
+
   // be sure to include its associated Product data
+  Tag.findAll({
+    // Here we add an "include" property to our options in our findAll query
+    // We set the value to an array of the models we want to include in a left outer join
+    // In this case, just `db.Post`
+    include: [
+      {
+        model: Product,
+        through:ProductTag
+      }
+    ]
+  }).then(tag => {
+    res.json(tag);
+  });
+
 });
 
 router.get('/:id', (req, res) => {
